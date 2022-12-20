@@ -1,50 +1,29 @@
-import React, { useEffect } from "react";
-import toast from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux";
-import { getProducts, removeProduct, toggleDeleteSuccess } from "../../features/products/productsSlice";
+import React, { useEffect, useState } from "react";
+import { useGetProductsQuery, useRemoveProductMutation } from "../../features/api/apiSlice";
 
 const ProductList = () => {
-  // const [products, setProducts] = useState([]);
+
+  const { data, isLoading } = useGetProductsQuery()
+  const [removeProduct,{removeResult}] = useRemoveProductMutation()
+  const products = data?.data;
 
 
-  // useEffect(() => {
-  //   fetch("http://localhost:5000/products")
-  //     .then((res) => res.json())
-  //     .then((data) => setProducts(data.data));
-  // });
-
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-
-    dispatch(getProducts())
-  }, [dispatch]);
-
-  const { products, isLoading , deleteSuccess } = useSelector((state) => state.products);
-
-
-  const handleDelete = (id)=>{
-    dispatch(removeProduct(id));
+  if (isLoading) {
+    return <div className='h-screen flex justify-center items-center'>Loading</div>
   }
 
-  useEffect(()=>{
-  
-    if(!isLoading && deleteSuccess){
-      toast.success("Product deleted",{id:"pDeleted"});
-      dispatch(toggleDeleteSuccess())
-    
-    }
-   
 
-  },[isLoading,deleteSuccess])
+  const handleRemove = (id) => {
+    removeProduct(id);
 
-  // console.log(products);
+  }
+
+
+
 
   let content;
-  if (isLoading) {
-    content = <>Loading</>
-  }
-  if (products.length && !isLoading) {
+
+  if (products) {
     content =
       products.map(({ model, brand, price, status, _id }) => (
         <tr>
@@ -73,7 +52,7 @@ const ProductList = () => {
           </td>
           <td className='p-2'>
             <div className='flex justify-center'>
-              <button onClick={()=>handleDelete(_id)}>
+              <button onClick={() => handleRemove(_id)}>
                 <svg
                   className='w-8 h-8 hover:text-blue-600 rounded-full hover:bg-gray-100 p-1'
                   fill='none'

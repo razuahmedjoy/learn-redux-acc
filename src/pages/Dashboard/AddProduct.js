@@ -2,15 +2,27 @@ import React from "react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { useDispatch, useSelector } from "react-redux";
-import { addProduct, togglePostSuccess } from "../../features/products/productsSlice";
+import { useAddProductMutation } from "../../features/api/apiSlice";
 
 const AddProduct = () => {
   const { register, handleSubmit,reset } = useForm();
 
-  const {isLoading,postSuccess,error,isError} = useSelector(state=>state.products);
+  const [postProduct,result] = useAddProductMutation();
+  const {isLoading,isError,isSuccess} = result;
 
-  const dispatch = useDispatch();
+  useEffect(()=>{
+
+    if(isLoading){
+      toast.loading("Adding Product",{id:"addProduct"});
+    }
+    if(isSuccess){
+      toast.success("Product Added Successfully",{id:"addProduct"});
+      reset();
+    }
+    if(isError){
+      toast.error("Some error occured",{id:"addProduct"});
+    }
+  },[isLoading,isSuccess,isError])
 
   const submit = (data) => {
     const product = {
@@ -27,29 +39,14 @@ const AddProduct = () => {
       spec: [],
     };
 
-    dispatch(addProduct(product));
+    postProduct(product);
+  
   
 
     console.log(product);
   };
 
-  useEffect(()=>{
-    if(isLoading){
-      toast.loading("Loading",{id:"addProduct"});
-    }
-
-    if(!isLoading && postSuccess){
-      toast.success("Product added",{id:"addProduct"});
-      dispatch(togglePostSuccess())
-      reset();
-    }
-    if(!isLoading && isError){
-      toast.error(error,{id:"addProduct"});
-
-    }
-
-  },[isLoading,postSuccess,isError,error,dispatch,reset])
-
+  // 
 
   return (
     <div className='flex justify-center items-center h-full '>
