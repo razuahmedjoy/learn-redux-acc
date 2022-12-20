@@ -1,3 +1,3 @@
-## server
+## Redux toolkit with thunk
 
-server link : https://github.com/mir-hussain/moon-tech-server
+there are different branch for different technology like redux thunk, redux toolkit, rtk query etc.
